@@ -327,4 +327,8 @@ function initializeGame() {
     endTurnButton.addEventListener('click', endTurn);
 }
 
+function updateTurnDisplay() {
+    currentTurnFactionEl.textContent = currentTurnFaction.replace('-', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
 initializeGame();
