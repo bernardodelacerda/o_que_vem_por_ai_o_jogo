@@ -277,21 +277,44 @@ function checkWinConditions() {
     }
 }
 
+// FUNÇÃO PARA PASSAR O TURNO (CORRIGIDA)
 function endTurn() {
     selectedUnitId = null;
     clearHighlights();
-    units.forEach(u => u.hasActed = false);
-    currentTurnIndex = (currentTurnIndex + 1) % factions.length;
-    currentTurnFaction = factions[currentTurnIndex];
+    units.forEach(u => u.hasActed = false); // Reseta o estado de ação de todas as unidades
+
+    // Loop inteligente para encontrar a próxima facção que ainda tenha unidades no jogo
+    let nextFactionFound = false;
+    for (let i = 0; i < factions.length; i++) {
+        currentTurnIndex = (currentTurnIndex + 1) % factions.length;
+        currentTurnFaction = factions[currentTurnIndex];
+
+        // Se o jogo encontrar unidades para a próxima facção, ele para e define o turno
+        if (units.some(u => u.faction === currentTurnFaction)) {
+            nextFactionFound = true;
+            break; // Encontrou a próxima facção válida
+        }
+    }
+    
+    // Se o loop terminar e não houver mais facções com unidades, não faz nada
+    if (!nextFactionFound) {
+        checkWinConditions(); // Roda uma última verificação de vitória/derrota
+        return;
+    }
+    
     updateTurnDisplay();
     renderUnits();
+
+    // Se for o turno da IA do Vazio, executa sua ação
     if (currentTurnFaction === 'vazio') {
-        endTurnButton.disabled = true;
+        endTurnButton.disabled = true; // Desabilita o botão durante o turno da IA
         performVoidTurn();
     } else {
-        endTurnButton.disabled = false;
+        endTurnButton.disabled = false; // Habilita para os jogadores
     }
 }
+    
+
 
 function handleBoardClick(event) {
     const clickedElement = event.target.closest('.grid-cell');
